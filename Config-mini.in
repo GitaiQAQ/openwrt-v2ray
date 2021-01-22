@@ -100,6 +100,14 @@ config PACKAGE_v2ray_mini_without_socks_proto
 	bool "Without Socks Protocol"
 	default n
 
+config PACKAGE_v2ray_mini_without_trojan_proto
+	bool "Without trojan Protocol"
+	default n
+
+config PACKAGE_v2ray_mini_without_vless_proto
+	bool "Without VLess Protocol"
+	default n
+
 config PACKAGE_v2ray_mini_without_vmess_proto
 	bool "Without VMess Protocol"
 	default n

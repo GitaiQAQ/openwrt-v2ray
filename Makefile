@@ -47,6 +47,8 @@ PKG_CONFIG_DEPENDS:= \
 	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_http_proto \
 	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_shadowsocks_proto \
 	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_socks_proto \
+	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_trojan_proto \
+	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_vless_proto \
 	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_vmess_proto \
 	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_tcp_trans \
 	CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_mkcp_trans \
@@ -203,6 +205,17 @@ V2RAY_SED_ARGS += \
 	s,_ "v2ray.com/core/proxy/socks",// &,;
 endif
 
+ifeq ($(CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_trojan_proto),y)
+V2RAY_SED_ARGS += \
+	s,_ "v2ray.com/core/proxy/trojan",// &,;
+endif
+
+ifeq ($(CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_vless_proto),y)
+V2RAY_SED_ARGS += \
+	s,_ "v2ray.com/core/proxy/vless/inbound",// &,; \
+	s,_ "v2ray.com/core/proxy/vless/outbound",// &,;
+endif
+
 ifeq ($(CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_without_vmess_proto),y)
 V2RAY_SED_ARGS += \
 	s,_ "v2ray.com/core/proxy/vmess/inbound",// &,; \
@@ -252,22 +265,20 @@ endif
 
 endif # custom features
 
-GEOIP_VER:=latest
-GEOIP_FILE:=geoip-$(GEOIP_VER).dat
+GEOIP_FILE:=geoip.dat
 
 define Download/geoip.dat
-  URL:=https://github.com/v2fly/geoip/releases/$(GEOIP_VER)/download
-  URL_FILE:=geoip.dat
+  URL:=https://github.com/v2fly/geoip/raw/release
+  URL_FILE:=$(GEOIP_FILE)
   FILE:=$(GEOIP_FILE)
   HASH:=skip
 endef
 
-GEOSITE_VER:=latest
-GEOSITE_FILE:=geosite-$(GEOSITE_VER).dat
+GEOSITE_FILE:=dlc.dat
 
 define Download/geosite.dat
-  URL:=https://github.com/v2fly/domain-list-community/releases/$(GEOSITE_VER)/download
-  URL_FILE:=dlc.dat
+  URL:=https://github.com/v2fly/domain-list-community/raw/release
+  URL_FILE:=$(GEOSITE_FILE)
   FILE:=$(GEOSITE_FILE)
   HASH:=skip
 endef
@@ -277,6 +288,8 @@ define Build/Prepare
 
 ifneq ($(CONFIG_PACKAGE_v2ray_$(BUILD_VARIANT)_exclude_assets),y)
 	# move file to make sure download new file every build
+	# FOR debugger
+	# cp -r $(DL_DIR)/v2ray-core-4.34.0/* $(PKG_BUILD_DIR)
 	mv -f $(DL_DIR)/$(GEOIP_FILE) $(PKG_BUILD_DIR)/release/config/geoip.dat
 	mv -f $(DL_DIR)/$(GEOSITE_FILE) $(PKG_BUILD_DIR)/release/config/geosite.dat
 endif
